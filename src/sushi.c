@@ -11,14 +11,13 @@ int main(int argc, char *argv[]) {
     int status;
     char *input;
     status = sushi_read_config(FILENAME);
-    if (status==0){
+    while (status==0){
         fprintf(stdout,"%s",SUSHI_DEFAULT_PROMPT);
         input = sushi_read_line(f);
         sushi_store(input);
         sushi_show_history();
-    }else{
-        return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
+
 }
 
