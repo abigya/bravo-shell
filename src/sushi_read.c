@@ -4,49 +4,56 @@
 #include <string.h>
 #include <ctype.h>
 
-//static char *history[SUSHI_HISTORY_LENGTH] = {NULL};
 char *sushi_read_line(FILE *in) {
   //create buffer for line
   char *buffer;
   buffer = (char*)malloc(sizeof(char)*SUSHI_MAX_INPUT+1);
-  size_t line = 80; //number of characters read by the buffer
-  size_t len = 81;//MAX_LINE_LENGTH; // number of bytes in the read buffer    
+  ssize_t line; //number of characters read by the buffer
+  size_t len = SUSHI_MAX_INPUT; // number of bytes in the read buffer    
   line = getline(&buffer, &len, in);
-
+  
   //check for errors in I/O
   if (line==-1){
-    perror("There is some error with the input!");
+    perror("There is some error with the input!\n");
     return NULL;
   }
   //check for blank line
   if (isspace(buffer[0])){
       return NULL;
   }
+
   //check length of line 
+  char *string;
   if (line>SUSHI_MAX_INPUT){
-      fprintf(stderr,"Warning! line %d is too long. Only %d characters will be used\n", SUSHI_MAX_INPUT);
-      buffer[strlen(buffer)]='\0';
+      fprintf(stderr,"Line is too long,truncated\n");
+      string = (char*)malloc(sizeof(char)*(SUSHI_MAX_INPUT+1));
+      strncpy(string,buffer,SUSHI_MAX_INPUT);
+      string[strlen(string)]='\0';
+
     }else{
-     buffer[strcspn(buffer, "\n")] = 0;
+      buffer[strcspn(buffer, "\n")] = 0;
+      string = (char*)malloc(sizeof(char)*(line+1));
+      strncpy(string,buffer,line);
+   
   }
-  return buffer;
+  return string;
 }
 
  
-
 int sushi_read_config(char *fname) {
-   FILE* fp = fopen(fname,"r");
-   if (NULL == fp){
-        perror("Error opening file.");
+  FILE *infile;
+   if (NULL == (infile = fopen(fname,"r"))){
+        perror("Error!");
         return 1;
     }
-
     char *line;
-    while (0 != feof(fp)){
-      line = sushi_read_line(fp);
-      sushi_store(line);
+    while (!feof(infile)){
+      line = sushi_read_line(infile);
     }
-    fclose(fp);
+
+    fclose(infile);
 
   return 0;
 }
+
+ 
