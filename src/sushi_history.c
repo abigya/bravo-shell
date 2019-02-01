@@ -10,7 +10,7 @@ void sushi_store(char *line){
  
    int hist =  SUSHI_HISTORY_LENGTH;
   //if history is not empty shift elements to right by 1
-  if (count<hist && count!=0){
+  if (count<hist){
     for(int i = count+1;i>0;i--){
       history[i]=history[i-1];
     }
@@ -21,7 +21,7 @@ void sushi_store(char *line){
       strncpy(history[0],line,strlen(line)+1);
       count++;
     }
-  
+   
 
     //check if history is full and remove recently inserted string
     
@@ -37,4 +37,3 @@ void sushi_show_history() {
         fprintf(stdout,"%d   %s\n",j+1,history[j]);
     }
 }
-
