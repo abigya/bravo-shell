@@ -20,6 +20,12 @@ void strlcpy(char* dst, const char* src, size_t bufsize){
   }
 }
 char *sushi_read_line(FILE *in) {
+  //check for errors in I/O
+  if (NULL == in){
+        perror("Error!");
+        return NULL;
+    }
+  
   //create buffer for line
   char *buffer;
   buffer = (char*)malloc(sizeof(char)*SUSHI_MAX_INPUT+1);
@@ -27,34 +33,29 @@ char *sushi_read_line(FILE *in) {
   size_t len = SUSHI_MAX_INPUT; // number of bytes in the read buffer    
   line = getline(&buffer, &len, in); // check this line 
   
-  //check for errors in I/O
-  if (line ==-1){ //check this line 
-    perror("There is some error with the input!\n");
-    return NULL;
-  }
   //check for blank line
-  if (isspace(buffer[0])){
+  if (isspace(buffer[0])> 0){
       return NULL;
   }
 
   //check length of line 
   char *string;
   size_t length;
+  buffer[strcspn(buffer, "\r\n")] = 0;
   if (line>SUSHI_MAX_INPUT){
       fprintf(stderr,"Line is too long,truncated\n");
       length = SUSHI_MAX_INPUT;
-      string = (char*)malloc(sizeof(char)*(SUSHI_MAX_INPUT+1));
-
+      string = malloc((SUSHI_MAX_INPUT+1));
       strlcpy(string,buffer,length);
       return string;
 
     }else{
-      buffer[strcspn(buffer, "\n")] = 0;
-       length = line;
-      string = (char*)malloc(sizeof(char)*(line+1));
+      length = (size_t)line;
+      string = malloc(length+1);
       strlcpy(string,buffer,length);
       return string;
    
+
   }
  
 }
