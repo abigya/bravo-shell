@@ -6,6 +6,8 @@
 static int count = 0;
 static char *history[SUSHI_HISTORY_LENGTH] = {NULL};
 
+
+
 void sushi_store(char *line){
  
    int hist =  SUSHI_HISTORY_LENGTH;
@@ -15,10 +17,10 @@ void sushi_store(char *line){
       history[i]=history[i-1];
     }
   }
-   
-   if (line!=NULL){
-      history[0] = malloc((strlen(line)+1));
-      strncpy(history[0],line,strlen(line)+1);
+  if (line != NULL ){
+      //history[0] = malloc((strlen(line)+1));
+      //strncpy(history[0],line,strlen(line));
+      history[0]=line;
       count++;
     }
    
@@ -37,3 +39,5 @@ void sushi_show_history() {
         fprintf(stdout,"%d   %s\n",j+1,history[j]);
     }
 }
+
+
