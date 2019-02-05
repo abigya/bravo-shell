@@ -6,38 +6,36 @@
 static int count = 0;
 static char *history[SUSHI_HISTORY_LENGTH] = {NULL};
 
-
-
 void sushi_store(char *line){
  
    int hist =  SUSHI_HISTORY_LENGTH;
   //if history is not empty shift elements to right by 1
-  if (count<hist){
-    for(int i = count+1;i>0;i--){
+  if (line != NULL && sizeof(history)!= 0){
+     for(int i = count;i>0;i--){
       history[i]=history[i-1];
     }
-  }
-  if (line != NULL ){
-      //history[0] = malloc((strlen(line)+1));
-      //strncpy(history[0],line,strlen(line));
       history[0]=line;
       count++;
-    }
+  }
+
+   //add to first index if history is empty
+   if(line!=NULL && sizeof(history)==0){
+   	history[0]=line;
+        count++;
+   }
    
 
-    //check if history is full and remove recently inserted string
-    
+    //check if history is full and remove least recently inserted string 
     if (count>(hist-1)){
       fprintf(stdout,"history is full!\n");
-      free(history[0]);
+      free(history[hist-1]);
+      count = hist-1;
     }
    
  }
 
 void sushi_show_history() {
     for(int j=0;j<count;j++){
-        fprintf(stdout,"%d   %s\n",j+1,history[j]);
+        fprintf(stdout,"%5d%*s%s\n",j+1,2,"",history[j]);
     }
 }
-
-
