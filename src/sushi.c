@@ -3,10 +3,10 @@
 #include "sushi.h"
 
 
-#define FILENAME "sushi.conf"
+#define FILENAME "sushi.conf" // DZ: Must be $HOME/sushi.conf
 
 int main(int argc, char *argv[]) {
-    FILE *f = stdin;
+  FILE *f = stdin; // DZ: ???
     int status;
     char *input;
     status = sushi_read_config(FILENAME);
