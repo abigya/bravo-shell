@@ -10,7 +10,6 @@
 //credits : stackoverflow
 void strlcpy(char* dst, const char* src, size_t bufsize){
   size_t srclen =strlen(src);
-  size_t result =srclen; /* Result is always the length of the src string */
   if(bufsize>0)
   {
     if(srclen>=bufsize)
@@ -48,18 +47,20 @@ char *sushi_read_line(FILE *in) {
       fprintf(stderr,"Line is too long,truncated\n");
       length = SUSHI_MAX_INPUT;
       string = malloc((SUSHI_MAX_INPUT+1));
-      strlcpy(string,buffer,length);
+     
 
     }else{
       
       length = (size_t)line;
       string = malloc(length+1);
-      strlcpy(string,buffer,length);
+      
    
 
   }
+  strlcpy(string,buffer,length);
   return string;
- 
+  free(buffer);
+  free(string);
 }
  
 int sushi_read_config(char *fname) {
