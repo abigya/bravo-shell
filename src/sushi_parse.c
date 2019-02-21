@@ -4,8 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 
-//removes spaces between from and to, and moves down the string after to
-
 // https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
 char *sushi_unquote(char *s) {
   char *new_str;

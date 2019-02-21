@@ -1,24 +1,31 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <libgen.h>
+#include <string.h>
 #include "sushi.h"
 
-
-
-#define FILENAME "sushi.conf" // DZ: Must be $HOME/sushi.conf
 int sushi_exit = 0;
 int main(int argc, char *argv[]) {
-    FILE *f = stdin; // DZ: ???
+    char *path = "$HOME/sushi.conf";
+    char *tok1 = strdup(path);
+    char *tok2 = strdup(path);
+    char *filename = basename(tok2);
+    FILE *f = stdin; //stdin is passed as file for read_line
     int p;
     char *input;
-    sushi_read_config(FILENAME);
-    //testing history function
+    sushi_read_config(filename);
+   
     while(sushi_exit==0){
      fprintf(stdout,"%s",SUSHI_DEFAULT_PROMPT);
      input = sushi_read_line(f);
-     p = sushi_parse_command(input);
-     if (p==0){
+     if (input!=NULL){
+      	p = sushi_parse_command(input);
+      }
+     //not sure if ! should be in the history array 
+     if (p==0 && input[0]!='!'){
      	sushi_store(input);
      }
+   
     }
 
     return 0;

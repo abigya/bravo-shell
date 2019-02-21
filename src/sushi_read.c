@@ -9,10 +9,7 @@
 //credits : stackoverflow
 void strlcpy(char* dst, const char* src, size_t bufsize){
   size_t srclen =strlen(src);
-  // DZ: You never use the result, why declare it?
-  size_t result =srclen; /* Result is always the length of the src string */
-  if(bufsize>0)
-  {
+  if(bufsize>0){
     if(srclen>=bufsize)
        srclen=bufsize-1;
     if(srclen>0)
@@ -22,7 +19,6 @@ void strlcpy(char* dst, const char* src, size_t bufsize){
 }
 
 char *sushi_read_line(FILE *in) {
-  // DZ: DON'T. Let the caller worry.
   //check for errors in I/O
   if (NULL == in){
         perror("Error!");
@@ -30,15 +26,14 @@ char *sushi_read_line(FILE *in) {
     }
   
   //create buffer for line
-  // DZ: Do not malloc data of known size char*buffer[SUSHI_MAX_INPUT+1];
   char *buffer;
-  // DZ: Must free the buffer on exit, or else memory leak
+  //have to use malloc on buffer to pass for getline
   buffer = (char*)malloc(sizeof(char)*SUSHI_MAX_INPUT+1);
   ssize_t line; //number of characters read by the buffer
   size_t len = SUSHI_MAX_INPUT; // number of bytes in the read buffer
   
-  // DZ: Very cool to use getline! But must check the returned value for errors
-  line = getline(&buffer, &len, in); 
+  line = getline(&buffer, &len, in);  //line will not be processed if getline returns -1
+
   buffer[strcspn(buffer, "\r\n")] = '\0';
 
   //check for blank line
@@ -49,6 +44,7 @@ char *sushi_read_line(FILE *in) {
   //check length of line 
   char *string;
   size_t length;
+ 
  
   if (line>SUSHI_MAX_INPUT){
       fprintf(stderr,"Line is too long, truncated\n");
@@ -66,20 +62,23 @@ char *sushi_read_line(FILE *in) {
   }
   free(buffer);
   return string;
+  
  
 }
  
 void sushi_read_config(char *fname) {
   FILE *infile;
    if (NULL == (infile = fopen(fname,"r"))){
-        perror("Error!");
+        perror(fname);
+        exit(0);
     }
-    char *line;
     int p;
     while (!feof(infile)){
-      line = sushi_read_line(infile);
-      p = sushi_parse_command(line);
-     if (p==0){
+      char *line = sushi_read_line(infile);
+      if (line!=NULL){
+      	p = sushi_parse_command(line);
+      }
+      if (p==0){
      	sushi_store(line);
       }
      	
