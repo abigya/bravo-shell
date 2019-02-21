@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
       	p = sushi_parse_command(input);
       }
      //not sure if ! should be in the history array 
-     if (p==0 && input[0]!='!'){
+     if (p==0){
      	sushi_store(input);
      }
    
