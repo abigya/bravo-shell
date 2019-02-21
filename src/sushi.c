@@ -3,26 +3,24 @@
 #include "sushi.h"
 
 
-#define FILENAME "$HOME/sushi.conf"
 
+#define FILENAME "sushi.conf" // DZ: Must be $HOME/sushi.conf
+int sushi_exit = 0;
 int main(int argc, char *argv[]) {
-    //passed stdin to file pointer since sushi_read_line has a File pointer as a parameter 
-    FILE *f = stdin;
-    int status;
+    FILE *f = stdin; // DZ: ???
+    int p;
     char *input;
-    status = sushi_read_config(FILENAME);
+    sushi_read_config(FILENAME);
     //testing history function
-    if (status==0){
+    while(sushi_exit==0){
      fprintf(stdout,"%s",SUSHI_DEFAULT_PROMPT);
      input = sushi_read_line(f);
-     sushi_store(input);
-     sushi_show_history();
-    }else{
-       return EXIT_FAILURE;
-    } 
-    
-    return EXIT_SUCCESS;
+     p = sushi_parse_command(input);
+     if (p==0){
+     	sushi_store(input);
+     }
+    }
 
+    return 0;
 }
-
 
