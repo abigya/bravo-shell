@@ -65,10 +65,11 @@
 #line 1 "sushi_yyparser.y" /* yacc.c:339  */
 
 #include "sushi.h"
+#include "stdlib.h"
   int yylex();
   void yyerror(const char* s);  
 
-#line 72 "sushi_yyparser.tab.c" /* yacc.c:339  */
+#line 73 "sushi_yyparser.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -124,12 +125,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 7 "sushi_yyparser.y" /* yacc.c:355  */
+#line 8 "sushi_yyparser.y" /* yacc.c:355  */
 
   char *s;
   int i;
 
-#line 133 "sushi_yyparser.tab.c" /* yacc.c:355  */
+#line 134 "sushi_yyparser.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -146,7 +147,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 150 "sushi_yyparser.tab.c" /* yacc.c:358  */
+#line 151 "sushi_yyparser.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -445,9 +446,9 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    33,    33,    35,    36,    39,    40,    43,    44,    47,
-      48,    51,    52,    55,    56,    59,    62,    63,    66,    67,
-      68,    69,    70,    71,    72,    75,    76,    79,    80,    83
+       0,    34,    34,    36,    37,    40,    41,    44,    45,    48,
+      49,    52,    53,    56,    57,    60,    63,    64,    67,    68,
+      69,    70,    71,    72,    73,    76,    77,    80,    81,    84
 };
 #endif
 
@@ -1240,37 +1241,37 @@ yyreduce:
   switch (yyn)
     {
         case 16:
-#line 62 "sushi_yyparser.y" /* yacc.c:1646  */
+#line 63 "sushi_yyparser.y" /* yacc.c:1646  */
     { (yyval.i) = 0; }
-#line 1246 "sushi_yyparser.tab.c" /* yacc.c:1646  */
+#line 1247 "sushi_yyparser.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 63 "sushi_yyparser.y" /* yacc.c:1646  */
+#line 64 "sushi_yyparser.y" /* yacc.c:1646  */
     { (yyval.i) = 1; }
-#line 1252 "sushi_yyparser.tab.c" /* yacc.c:1646  */
+#line 1253 "sushi_yyparser.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 68 "sushi_yyparser.y" /* yacc.c:1646  */
-    { /* Add your code here */ }
-#line 1258 "sushi_yyparser.tab.c" /* yacc.c:1646  */
+#line 69 "sushi_yyparser.y" /* yacc.c:1646  */
+    {sushi_show_history();}
+#line 1259 "sushi_yyparser.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 69 "sushi_yyparser.y" /* yacc.c:1646  */
-    { /* Add your code here */ }
-#line 1264 "sushi_yyparser.tab.c" /* yacc.c:1646  */
+#line 70 "sushi_yyparser.y" /* yacc.c:1646  */
+    {exit(0);}
+#line 1265 "sushi_yyparser.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 83 "sushi_yyparser.y" /* yacc.c:1646  */
+#line 84 "sushi_yyparser.y" /* yacc.c:1646  */
     { (yyval.s) = (yyvsp[0].s); }
-#line 1270 "sushi_yyparser.tab.c" /* yacc.c:1646  */
+#line 1271 "sushi_yyparser.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1274 "sushi_yyparser.tab.c" /* yacc.c:1646  */
+#line 1275 "sushi_yyparser.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1498,7 +1499,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 85 "sushi_yyparser.y" /* yacc.c:1906  */
+#line 86 "sushi_yyparser.y" /* yacc.c:1906  */
 
 
 /* This section is empty */
