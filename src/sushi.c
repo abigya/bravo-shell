@@ -6,10 +6,13 @@
 
 int sushi_exit = 0;
 int main(int argc, char *argv[]) {
+  // DZ: There is no such file "$HOME/sushi.conf"
+  // DZ: $HOME must be replaced by its value using getenv()
     char *path = "$HOME/sushi.conf";
-    char *tok1 = strdup(path);
-    char *tok2 = strdup(path);
-    char *filename = basename(tok2);
+    char *tok1 = strdup(path); // DZ - ???
+    char *tok2 = strdup(path); // DZ - ???
+    char *filename = basename(tok2); // DZ - ???
+    // DZ: Why not pass stdin directly? Do not copy vatiables without a need
     FILE *f = stdin; //stdin is passed as file for read_line
     int p;
     char *input;

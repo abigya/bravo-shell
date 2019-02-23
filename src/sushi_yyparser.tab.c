@@ -1260,7 +1260,7 @@ yyreduce:
 
   case 21:
 #line 70 "sushi_yyparser.y" /* yacc.c:1646  */
-    {exit(0);}
+    {exit(0); /* DZ: Must set the flag, not call exit (se 3c) */}
 #line 1265 "sushi_yyparser.tab.c" /* yacc.c:1646  */
     break;
 

@@ -67,7 +67,7 @@ program:
   args /* TODO */
 | arg YY_SUSHI_SET arg  /* TODO */
 | YY_SUSHI_HISTORY {sushi_show_history();}
-| YY_SUSHI_EXIT {exit(0);}
+| YY_SUSHI_EXIT {exit(0); /* DZ: Must set the flag, not call exit (se 3c) */}
 | YY_SUSHI_JOBS /* TODO */
 | YY_SUSHI_PWD  /* TODO */
 | YY_SUSHI_CD arg /* TODO */

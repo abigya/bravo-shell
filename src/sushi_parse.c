@@ -18,11 +18,11 @@ char *sushi_unquote(char *s) {
   }
   for(i = 0; i < length; i++, count++){
     //compare the chr to the list of esp chars
-    if(s[i] == '\\'  && !(&s[i+1] == NULL) ){
+    if(s[i] == '\\'  && !(&/* DZ: No &! */s[i+1] == NULL) ){
       switch(s[i+1]){
           case 'n' :
             new_str[count]= '\n';
-            i++;
+            i++; // DZ: You repeated this line 10 times.
             break;
           case 'a' :
             new_str[count] = '\a';
@@ -68,7 +68,7 @@ char *sushi_unquote(char *s) {
             //i++;
             //break;
 
-          default:  
+      default:  // DZ: No need to implement this
             if(s[i+1] == 'x'){
               //Largest Hexidecimal number in 32bit sys, '7FFF,FFFF' (8 bytes).
               char* number = (char*)malloc(sizeof(char)*8);
