@@ -1,10 +1,18 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <libgen.h>
 #include <string.h>
 #include "sushi.h"
 
 int sushi_exit = 0;
+
+static void refuse_to_die(int sig)
+{
+  // TODO
+}
+
+static void prevent_interruption() {
+  // TODO
+}
+
 int main(int argc, char *argv[]) {
     char *path = "$HOME/sushi.conf";
     char *tok1 = strdup(path);
@@ -14,7 +22,9 @@ int main(int argc, char *argv[]) {
     int p;
     char *input;
     sushi_read_config(filename);
-   
+    
+    prevent_interruption();
+    
     while(sushi_exit==0){
      fprintf(stdout,"%s",SUSHI_DEFAULT_PROMPT);
      input = sushi_read_line(f);
