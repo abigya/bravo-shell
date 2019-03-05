@@ -57,71 +57,12 @@ char *sushi_unquote(char *s) {
             i++;
             break;
 
-          case '\\' :
+          default :
             new_str[count]= '\\';
             i++;
             break;
-
-          //case 'e' :
-            //new_str[count] = '\e';
-            //i++;
-            //break;
-
-          default:  
-            if(s[i+1] == 'x'){
-              //Largest Hexidecimal number in 32bit sys, '7FFF,FFFF' (8 bytes).
-              char* number = (char*)malloc(sizeof(char)*8);
-              int k;
-              for(k = 2; isxdigit(s[i+k]); k++){
-                number[k-2] = s[i+k];
-              }
-              number[k-1]= '\0';
-              new_str[count] = (char)strtol(number, NULL, 16);
-              i += strlen(number);
-              free(number);
-            }
-            else if (s[i+1] == 'u')
-            {
-              //Only 4 chars needed
-              char* number = (char*)malloc(sizeof(char)*4);
-              int k;
-              for(k = 2; isxdigit(s[i+k]); k++){
-                number[k-2] = s[i+k];
-              }
-              number[k-1]= '\0';
-              new_str[count] = (char)strtol(number, NULL, 16);
-              i += strlen(number);
-              free(number);  
-            }
-            else if (isdigit(s[i+1]))
-            {
-              char* number = (char*)malloc(sizeof(char)*3);
-              int k;
-              for(k = 2; isdigit(s[i + k]); k++){
-                number[k-2] = s[i+k];
-              }
-              number[k-1]= '\0';
-              i += strlen(number);
-              new_str[count] = (char)strtol(number, NULL, 8);
-              free(number);
-          }
-          else if (s[i+1] == 'U')
-          {
-              //Only 8 bits needed
-              char* number = (char*)malloc(sizeof(char)*8);
-              int k;
-              for(k = 2; isxdigit(s[i+k]); k++){
-                number[k-2] = s[i+k];
-              }
-                number[k-1]= '\0';
-                i += strlen(number);
-                new_str[count] = (char)strtol(number, NULL, 16);
-                free(number);
-          }        
-       }
-    }
-    else
-    {
+    } 
+    }else{
       new_str[count] = s[i];
     }
     
@@ -142,15 +83,46 @@ void free_memory(prog_t *exe, prog_t *pipe) {
 }
 
 int spawn(prog_t *exe, prog_t *pipe, int bgmode) {
-  return 0; // TODO
+  int status = fork();
+  if(status == 0){
+    int size = exe->args.size;
+    prog_t *new = super_realloc(exe->args.args, size + 1);
+    
+    exe->args.args[size + 1] = NULL;
+
+    if(execvp(exe->args.args[0], new->args.args) == -1){
+      exit(0);
+    }
+  
+  free_memory(exe, pipe);
+
+  }
+
+  return status; 
 }
 
 void *super_malloc(size_t size) {
-  return NULL; // TODO
+   void* result = malloc(size);
+  if(NULL == result){
+    abort();
+  }
+  return result;
 }
 
 void *super_realloc(void *ptr, size_t size) {
-  return NULL; // TODO
+  void* result = realloc(ptr, size);
+  if(NULL == result){
+    abort();
+  }
+  return result;
 }
+void *super_strdup(void *ptr){
+  void* result = strdup(ptr);
+  if(NULL == result){
+    abort();
+  }
+  return result;
+}
+
 
 
