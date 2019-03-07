@@ -1,5 +1,7 @@
 #include <string.h>
 #include <ctype.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 #include "sushi.h"
 #include "sushi_yyparser.tab.h"
 
@@ -83,22 +85,59 @@ void free_memory(prog_t *exe, prog_t *pipe) {
 }
 
 int spawn(prog_t *exe, prog_t *pipe, int bgmode) {
-  int status = fork();
-  if(status == 0){
-    int size = exe->args.size;
-    prog_t *new = super_realloc(exe->args.args, size + 1);
+   pid_t child;
+   int status;
+   pid_t c;
+   
+  int size = exe->args.size;
+  super_realloc(exe->args.args, (size+1)*sizeof(char*));
+  exe->args.args[size] = NULL;
+
+  if ((child = fork())==0){
+    fprintf(stdout,"This is the child process.\n");
+    execvp(exe->args.args[0],exe->args.args);
+    free_memory(exe,pipe);
     
-    exe->args.args[size + 1] = NULL;
-
-    if(execvp(exe->args.args[0], new->args.args) == -1){
-      exit(0);
-    }
+   fprintf(stderr,"Child could not be created!\n");
+   exit(0);
   
-  free_memory(exe, pipe);
-
+  }else{
+  	if (child==(pid_t)(-1)){
+             fprintf(stderr,"fork failed!\n");
+             exit(0);
+        }else{
+           c = wait(&status);
+            fprintf(stdout,"child process has ended.\n");
+        }
   }
+  return 0;
+  
+  
+ 
+  /**int status = fork();
+  if(status == 0){
+    //this is the child process
+    fprintf(stdout,"This is the child process.\n");
+    int size = exe->args.size;
+    super_realloc(exe->args.args, (size+1)*sizeof(char*));
+    
+    exe->args.args[size] = NULL;
 
-  return status; 
+    if(execvp(exe->args.args[0],exe->args.args) == -1){
+      exit(0);
+    
+    }
+    free_memory(exe,pipe);
+  }else if(status>0){
+    fprintf(stdout,"This is the parent process.\n");
+
+  }else{
+ 	fprintf(stdout,"Child could not be created!\n");
+  }  
+    
+  
+  return status;**/
+  
 }
 
 void *super_malloc(size_t size) {

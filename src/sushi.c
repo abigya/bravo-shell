@@ -6,17 +6,17 @@
 int sushi_exit;
 
 static void refuse_to_die(int sig){
-  if(sig==SIGINT){
+   signal(SIGINT,refuse_to_die);
    fprintf(stderr,"Type exit to quit!\n");
-  }
 }
 
 static void prevent_interruption() {
- struct sigaction sa;
+ signal(SIGINT,refuse_to_die);
+ /**struct sigaction sa;
  sa.sa_handler = refuse_to_die;
  sigemptyset(&(sa.sa_mask));
  sigaddset(&(sa.sa_mask),SIGINT);
- sigaction(SIGINT,&sa,NULL);
+ sigaction(SIGINT,&sa,NULL);**/
  
 }
 
