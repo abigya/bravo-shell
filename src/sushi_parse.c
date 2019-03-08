@@ -23,47 +23,39 @@ char *sushi_unquote(char *s) {
       switch(s[i+1]){
           case 'n' :
             new_str[count]= '\n';
-            i++;
             break;
           case 'a' :
             new_str[count] = '\a';
-            i++;
             break;
 
           case 'b' :
             new_str[count]= '\b';
-            i++;
             break;
 
           case 'f' :
             new_str[count]= '\f';
-            i++;
             break;
 
           case 'r' :
             new_str[count]= '\r';
-            i++;
             break;
 
           case 't' :
             new_str[count]= '\t';
-            i++;
             break;
           case 'v' :
             new_str[count]= '\v';
-            i++;
             break;
 
           case '\'' :
             new_str[count]= '\'';
-            i++;
             break;
 
           default :
             new_str[count]= '\\';
-            i++;
             break;
     } 
+    i++;
     }else{
       new_str[count] = s[i];
     }
