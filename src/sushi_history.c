@@ -17,11 +17,10 @@ void sushi_store(char *line){
       history[0]=line;
       count++;
   }
-  //delete oldest element in history, this code seems to work fine, program gives weird output without this code 
-  //I am not sure why
+  //delete oldest element in history
   if(count>(hist-1)){
 	fprintf(stdout,"History is full\n");
-        free(history[hist-1]);
+        history[hist-1]=NULL;
         count = hist-1;
   
    } 
@@ -29,7 +28,6 @@ void sushi_store(char *line){
  }
 
 void sushi_show_history() {
-  //i get segmentation fault if i use sizeof(history) here
     for(int j=0;j<count;j++){
         fprintf(stdout,"%5d%*s%s\n",j+1,2,"",history[j]);
     }

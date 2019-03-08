@@ -92,12 +92,12 @@ int spawn(prog_t *exe, prog_t *pipe, int bgmode) {
   int size = exe->args.size;
   super_realloc(exe->args.args,(size+1)*sizeof(char*));
   exe->args.args[size] = NULL;
-
+  
   if ((child = fork())==0){
-    fprintf(stdout,"This is the child process.\n");
+    //fprintf(stdout,"This is the child process.\n");
     execvp(exe->args.args[0],exe->args.args);
-    
-   fprintf(stderr,"Child could not be created!\n");
+     free_memory(exe,pipe);
+   //fprintf(stderr,"Child could not be created!\n");
    exit(0);
   
   }else{
@@ -106,37 +106,11 @@ int spawn(prog_t *exe, prog_t *pipe, int bgmode) {
              exit(0);
         }else{
            c = wait(&status);
-            fprintf(stdout,"child process has ended.\n");
+            //fprintf(stdout,"child process has ended.\n");
         }
   }
-  free_memory(exe,pipe);
-  return 0;
-  
-  
  
-  /**int status = fork();
-  if(status == 0){
-    //this is the child process
-    fprintf(stdout,"This is the child process.\n");
-    int size = exe->args.size;
-    super_realloc(exe->args.args, (size+1)*sizeof(char*));
-    
-    exe->args.args[size] = NULL;
-
-    if(execvp(exe->args.args[0],exe->args.args) == -1){
-      exit(0);
-    
-    }
-    free_memory(exe,pipe);
-  }else if(status>0){
-    fprintf(stdout,"This is the parent process.\n");
-
-  }else{
- 	fprintf(stdout,"Child could not be created!\n");
-  }  
-    
-  
-  return status;**/
+  return 0;
   
 }
 

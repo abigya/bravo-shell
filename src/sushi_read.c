@@ -4,9 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 
-//strlcpy is not provided on windows so I had to create a function
-//it is more efficient than using strncopy
-//credits : stackoverflow
 void strlcpy(char* dst, const char* src, size_t bufsize){
   size_t srclen =strlen(src);
   if(bufsize>0){
@@ -28,7 +25,7 @@ char *sushi_read_line(FILE *in) {
   //create buffer for line
   char *buffer;
   //have to use malloc on buffer to pass for getline
-  buffer = (char*)malloc(sizeof(char)*SUSHI_MAX_INPUT+1);
+  buffer = (char*)super_malloc(sizeof(char)*SUSHI_MAX_INPUT+1);
   ssize_t line; //number of characters read by the buffer
   size_t len = SUSHI_MAX_INPUT; // number of bytes in the read buffer
   
@@ -49,13 +46,13 @@ char *sushi_read_line(FILE *in) {
   if (line>SUSHI_MAX_INPUT){
       fprintf(stderr,"Line is too long, truncated\n");
       length = SUSHI_MAX_INPUT;
-      string = malloc((SUSHI_MAX_INPUT+1));
+      string = super_malloc((SUSHI_MAX_INPUT+1));
       strlcpy(string,buffer,length);
 
     }else{
       
       length = (size_t)line;
-      string = malloc(length+1);
+      string = super_malloc(length+1);
       strlcpy(string,buffer,length);
    
 
@@ -82,7 +79,6 @@ int sushi_read_config(char *fname) {
       }
      	
     }
-  
-    fclose(infile);
-    return 0; // Added by DZ; fixit
+ 
+    return 0; 
 }
