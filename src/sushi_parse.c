@@ -90,13 +90,12 @@ int spawn(prog_t *exe, prog_t *pipe, int bgmode) {
    pid_t c;
    
   int size = exe->args.size;
-  super_realloc(exe->args.args, (size+1)*sizeof(char*));
+  super_realloc(exe->args.args,(size+1)*sizeof(char*));
   exe->args.args[size] = NULL;
 
   if ((child = fork())==0){
     fprintf(stdout,"This is the child process.\n");
     execvp(exe->args.args[0],exe->args.args);
-    free_memory(exe,pipe);
     
    fprintf(stderr,"Child could not be created!\n");
    exit(0);
@@ -110,6 +109,7 @@ int spawn(prog_t *exe, prog_t *pipe, int bgmode) {
             fprintf(stdout,"child process has ended.\n");
         }
   }
+  free_memory(exe,pipe);
   return 0;
   
   
