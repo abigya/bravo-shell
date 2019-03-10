@@ -76,7 +76,17 @@ void free_memory(prog_t *exe, prog_t *pipe) {
   // TODO - but not this time
 }
 
-int spawn(prog_t *exe, prog_t *pipe, int bgmode) {
+// Skeleton
+void sushi_assign(char *name, char *value) {
+}
+
+// Skeleton
+char *sushi_safe_getenv(char *name) {
+  return NULL; // DZ: change it!
+}
+
+
+int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode) {
    pid_t child;
    int status;
    pid_t c;
