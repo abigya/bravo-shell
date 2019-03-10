@@ -24,6 +24,7 @@ char *sushi_read_line(FILE *in) {
   
   //create buffer for line
   char *buffer;
+  // DZ: Do not need (char*) or sizeof(char)
   //have to use malloc on buffer to pass for getline
   buffer = (char*)super_malloc(sizeof(char)*SUSHI_MAX_INPUT+1);
   ssize_t line; //number of characters read by the buffer
@@ -67,6 +68,7 @@ int sushi_read_config(char *fname) {
   FILE *infile;
    if (NULL == (infile = fopen(fname,"r"))){
         perror(fname);
+	// DZ: So what? Why do you continue as if nothing happened?
     }
     int p;
     while (!feof(infile)){
