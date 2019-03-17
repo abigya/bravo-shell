@@ -67,6 +67,7 @@ int sushi_read_config(char *fname) {
   FILE *infile;
    if (NULL == (infile = fopen(fname,"r"))){
         perror(fname);
+        exit(0);
     }
     int p;
     while (!feof(infile)){

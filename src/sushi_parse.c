@@ -92,23 +92,22 @@ int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode) {
    pid_t c;
    
   int size = exe->args.size;
-  super_realloc(exe->args.args,(size+1)*sizeof(char*));
+  exe->args.args = super_realloc(exe->args.args,(size+1)*sizeof(char*));
   exe->args.args[size] = NULL;
   
   if ((child = fork())==0){
-    //fprintf(stdout,"This is the child process.\n");
-    execvp(exe->args.args[0],exe->args.args);
+     execvp(exe->args.args[0],exe->args.args);
      free_memory(exe,pipe);
-   //fprintf(stderr,"Child could not be created!\n");
-   exit(0);
+    perror("Child could not be created!\n");
+    exit(0);
   
   }else{
   	if (child==(pid_t)(-1)){
-             fprintf(stderr,"fork failed!\n");
+             perror("fork failed!\n");
              exit(0);
         }else{
            c = wait(&status);
-            //fprintf(stdout,"child process has ended.\n");
+            
         }
   }
  
@@ -131,7 +130,7 @@ void *super_realloc(void *ptr, size_t size) {
   }
   return result;
 }
-void *super_strdup(void *ptr){
+char *super_strdup(void *ptr){
   void* result = strdup(ptr);
   if(NULL == result){
     abort();

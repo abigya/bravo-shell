@@ -49,7 +49,7 @@ void __not_implemented__();
 // The likelyhood of the event is low, but the consequences are grave
 void *super_malloc(size_t size);
 void *super_realloc(void *ptr, size_t size);
-void *super_strdup(void *ptr);
+char *super_strdup(void *ptr);
 
 void sushi_assign(char *name, char *value);
 char *sushi_safe_getenv(char *name);
