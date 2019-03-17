@@ -94,8 +94,32 @@ int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode) {
   int size = exe->args.size;
   exe->args.args = super_realloc(exe->args.args,(size+1)*sizeof(char*));
   exe->args.args[size] = NULL;
+  child = fork(); //fork new process
   
-  if ((child = fork())==0){
+  /**if (child!=0 && bgmode==0){
+      waitpid(-1,&status,WNOHANG);
+  }**/
+  if (child ==0 && bgmode ==1){ //child process
+      setpgid(child,0); //create new process group leader
+      execvp(exe->args.args[0],exe->args.args); //execute background process
+      exit(0);
+  }
+  if (child ==0 && bgmode !=1){
+     execvp(exe->args.args[0],exe->args.args);
+  }else if(bgmode!=1){//parent process
+     free_memory(exe,pipe);
+     waitpid(child,&status,WUNTRACED);
+
+    if (status==0){
+        perror("Child process terminated normally\n");
+    }
+
+    if (status==1){
+        perror("Child process terminated with an error\n");
+    }
+  }
+  
+ /**if (child ==0){
      execvp(exe->args.args[0],exe->args.args);
      free_memory(exe,pipe);
     perror("Child could not be created!\n");
@@ -106,10 +130,11 @@ int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode) {
              perror("fork failed!\n");
              exit(0);
         }else{
+           //execvp(exe->args.args[0],exe->args.args);
            c = wait(&status);
             
         }
-  }
+  }**/
  
   return 0;
   
