@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include "sushi.h"
 #include "sushi_yyparser.tab.h"
+#include <stdlib.h>
 
 // https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
 char *sushi_unquote(char *s) {
@@ -73,16 +74,44 @@ void __not_implemented__() {
 
 // Function skeletons for HW3
 void free_memory(prog_t *exe, prog_t *pipe) {
-  // TODO - but not this time
+    int arsize = exe->args.size;
+    for (int i=0; i<arsize;i++){
+    	if(exe->args.args[i]!=NULL){
+        	free(exe->args.args[i]);    
+        }
+     }
+     free(exe->args.args);
+     if (exe->redirection.in!=NULL){
+          free(exe->redirection.in);
+     } 
+      if (exe->redirection.out1!=NULL){
+          free(exe->redirection.out1);
+     } 
+      if (exe->redirection.out2!=NULL){
+          free(exe->redirection.out2);
+     } 
+    
+    free(exe);
+ 
+  
 }
 
 // Skeleton
 void sushi_assign(char *name, char *value) {
+    setenv(name,value,strlen(value));
+    free(value);
+    free(name);
 }
 
 // Skeleton
 char *sushi_safe_getenv(char *name) {
-  return NULL; // DZ: change it!
+  char *vname =  getenv(name);
+  if (vname!=NULL){
+      return vname;
+  }else{
+  	return ""; 
+ }
+
 }
 
 
@@ -96,9 +125,7 @@ int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode) {
   exe->args.args[size] = NULL;
   child = fork(); //fork new process
   
-  /**if (child!=0 && bgmode==0){
-      waitpid(-1,&status,WNOHANG);
-  }**/
+
   if (child ==0 && bgmode ==1){ //child process
       setpgid(child,0); //create new process group leader
       execvp(exe->args.args[0],exe->args.args); //execute background process
@@ -109,32 +136,11 @@ int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode) {
   }else if(bgmode!=1){//parent process
      free_memory(exe,pipe);
      waitpid(child,&status,WUNTRACED);
-
-    if (status==0){
-        perror("Child process terminated normally\n");
-    }
-
-    if (status==1){
-        perror("Child process terminated with an error\n");
-    }
+    
+     char *retval = malloc(sizeof(status));
+     sprintf(retval,"%d",status);
+     setenv("_",retval,strlen(retval));
   }
-  
- /**if (child ==0){
-     execvp(exe->args.args[0],exe->args.args);
-     free_memory(exe,pipe);
-    perror("Child could not be created!\n");
-    exit(0);
-  
-  }else{
-  	if (child==(pid_t)(-1)){
-             perror("fork failed!\n");
-             exit(0);
-        }else{
-           //execvp(exe->args.args[0],exe->args.args);
-           c = wait(&status);
-            
-        }
-  }**/
  
   return 0;
   
