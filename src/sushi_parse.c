@@ -9,7 +9,7 @@
 // https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
 char *sushi_unquote(char *s) {
   char *new_str;
-  new_str = (char*)malloc(sizeof(char)*strlen(s)+1);
+  new_str = (char*)super_malloc(sizeof(char)*strlen(s)+1);
   size_t i = 0;
   size_t count =0;
   size_t length = strlen(s);
@@ -92,7 +92,6 @@ void free_memory(prog_t *exe, prog_t *pipe) {
      } 
     
     free(exe);
- 
   
 }
 

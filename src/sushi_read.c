@@ -25,7 +25,7 @@ char *sushi_read_line(FILE *in) {
   //create buffer for line
   char *buffer;
   //have to use malloc on buffer to pass for getline
-  buffer = (char*)super_malloc(sizeof(char)*SUSHI_MAX_INPUT+1);
+  buffer = super_malloc(SUSHI_MAX_INPUT+1);
   ssize_t line; //number of characters read by the buffer
   size_t len = SUSHI_MAX_INPUT; // number of bytes in the read buffer
   
@@ -69,15 +69,17 @@ int sushi_read_config(char *fname) {
         perror(fname);
         exit(0);
     }
-    int p;
+   
     while (!feof(infile)){
-      char *line = sushi_read_line(infile);
+      int p;
+      char *line;
+      line = sushi_read_line(infile);
       if (line!=NULL){
       	p = sushi_parse_command(line);
-      }
-      if (p==0){
-     	sushi_store(line);
-      }
+        if (p==0){
+     	 sushi_store(line);
+        }
+     }
      	
     }
  
