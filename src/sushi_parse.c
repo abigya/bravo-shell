@@ -97,6 +97,8 @@ void free_memory(prog_t *exe, prog_t *pipe) {
 
 // Skeleton
 void sushi_assign(char *name, char *value) {
+  // DZ: The last parameter to setenv() is not any kind of length
+  // DZ: Must check the returned value
     setenv(name,value,strlen(value));
     free(value);
     free(name);
@@ -126,20 +128,32 @@ int sushi_spawn(prog_t *exe, prog_t *pipe, int bgmode) {
   
 
   if (child ==0 && bgmode ==1){ //child process
+    // DZ: Do NOT create new group leader
       setpgid(child,0); //create new process group leader
       execvp(exe->args.args[0],exe->args.args); //execute background process
+      // DZ: Must print an error message
       exit(0);
   }
   if (child ==0 && bgmode !=1){
      execvp(exe->args.args[0],exe->args.args);
+     // DZ: Must print an error message and exit
   }else if(bgmode!=1){//parent process
      free_memory(exe,pipe);
+
+     // DZ: Must check the returned value
      waitpid(child,&status,WUNTRACED);
-    
+
+     // DZ: First, this is a memory leak; must free before returning
+     // DZ: Second, size of int has nothing to do with the length of retval
+     // DZ: Third, static declaration char retval[4]; is sufficient
+     // DZ: Never use malloc for a loval var if the size os known
      char *retval = malloc(sizeof(status));
      sprintf(retval,"%d",status);
+     // DZ: The last parameter to setenv() is not any kind of length
      setenv("_",retval,strlen(retval));
   }
+
+  // DZ: What if child==-1?
  
   return 0;
   
@@ -161,6 +175,7 @@ void *super_realloc(void *ptr, size_t size) {
   return result;
 }
 char *super_strdup(void *ptr){
+  // DZ: must be char*
   void* result = strdup(ptr);
   if(NULL == result){
     abort();
