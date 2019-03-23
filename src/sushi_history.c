@@ -8,7 +8,6 @@ static char *history[SUSHI_HISTORY_LENGTH] = {NULL};
 
 void sushi_store(char *line){
  
-   int hist =  SUSHI_HISTORY_LENGTH;
   //if history is not empty shift elements to right by 1
    if (line != NULL ){ 
      for(int i = count;i>0;i--){
@@ -18,10 +17,10 @@ void sushi_store(char *line){
       count++;
   }
   //delete oldest element in history
-  if(count>(hist-1)){
+  if(count>(SUSHI_HISTORY_LENGTH-1)){
 	fprintf(stdout,"History is full\n");
-        history[hist-1]=NULL;
-        count = hist-1;
+        history[SUSHI_HISTORY_LENGTH-1]=NULL;
+        count = SUSHI_HISTORY_LENGTH-1;
   
    } 
    
