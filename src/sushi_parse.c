@@ -173,7 +173,45 @@ static void dup_me (int new, int old) {
  *--------------------------------------------------------------------*/
 
 int sushi_spawn(prog_t *exe, int bgmode) {
-   pid_t child;
+    
+    
+    pid_t child_a,child_b;
+    int mypipe[2];
+    
+    pipe(mypipe);
+    
+   child_a =fork(); //closes the read end
+   child_b = fork();
+ if (bgmode==1){
+   if (child_a==0){
+        close(0);
+  	dup_me(mypipe[1],STDOUT_FILENO);
+        close(mypipe[0]);
+        close(mypipe[1]);
+        start(exe->prev);
+   }
+   
+   if (child_b==0){
+        close(1);
+  	dup_me(mypipe[1],STDIN_FILENO);
+        close(mypipe[0]);
+        close(mypipe[1]);
+        start(exe->prev);
+        
+   }
+   
+
+  }else{
+      
+       wait_and_setenv(child_a);
+       wait_and_setenv(child_b);
+  }
+
+    close(mypipe[0]);
+    close(mypipe[1]);
+    
+
+   /**pid_t child;
    int status;
    pid_t c;
    
@@ -197,7 +235,7 @@ int sushi_spawn(prog_t *exe, int bgmode) {
      char *retval = malloc(sizeof(status));
      sprintf(retval,"%d",status);
      setenv("_",retval,strlen(retval));
-  }
+  }**/
  
   return 0;
   
