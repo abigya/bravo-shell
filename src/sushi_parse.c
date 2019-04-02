@@ -173,69 +173,43 @@ static void dup_me (int new, int old) {
  *--------------------------------------------------------------------*/
 
 int sushi_spawn(prog_t *exe, int bgmode) {
-    
-    
-    pid_t child_a,child_b;
     int mypipe[2];
-    
-    pipe(mypipe);
-    
-   child_a =fork(); //closes the read end
+    pid_t child_a, child_b;
+    if(pipe(mypipe)==-1){
+       perror("Pipe failed!\n");
+       exit(1);
+    }
+//stdin is 0
+//stdout is 1
+   child_a= fork();
    child_b = fork();
- if (bgmode==1){
-   if (child_a==0){
-        close(0);
-  	dup_me(mypipe[1],STDOUT_FILENO);
-        close(mypipe[0]);
-        close(mypipe[1]);
-        start(exe->prev);
-   }
    
-   if (child_b==0){
-        close(1);
-  	dup_me(mypipe[1],STDIN_FILENO);
-        close(mypipe[0]);
-        close(mypipe[1]);
-        start(exe->prev);
-        
-   }
-   
-
-  }else{
+   if (child_a==0 && bgmode == 1){//first fork
+      close(mypipe[0]);
+      dup_me(mypipe[1],1);
+      start(exe);
+      exe = exe->prev;
+      perror("execvp failed!\n");
+      exit(1);
+     
+    }
+     if (child_b==0 && bgmode !=1){//child b
+       close(mypipe[1]);
+       dup_me(mypipe[0],0);
+       start(exe);
+       exe = exe->prev;
       
+       perror("execvp failed!\n");
+       exit(1);
+   }else if (bgmode == 0){
+      //parent
+       free_memory(exe);
+       close(mypipe[0]);
+       close(mypipe[1]);
        wait_and_setenv(child_a);
        wait_and_setenv(child_b);
   }
 
-    close(mypipe[0]);
-    close(mypipe[1]);
-    
-
-   /**pid_t child;
-   int status;
-   pid_t c;
-   
-  int size = exe->args.size;
-  exe->args.args = super_realloc(exe->args.args,(size+1)*sizeof(char*));
-  exe->args.args[size] = NULL;
-  child = fork(); //fork new process
-  
-
-  if (child ==0 && bgmode ==1){ //child process
-      setpgid(child,0); //create new process group leader
-      execvp(exe->args.args[0],exe->args.args); //execute background process
-      exit(0);
-  }
-  if (child ==0 && bgmode !=1){
-     execvp(exe->args.args[0],exe->args.args);
-  }else if(bgmode!=1){//parent process
-    free_memory(exe);
-     waitpid(child,&status,WUNTRACED);
-    
-     char *retval = malloc(sizeof(status));
-     sprintf(retval,"%d",status);
-     setenv("_",retval,strlen(retval));
-  }**/
  
   return 0;
   
@@ -265,6 +239,11 @@ char *super_strdup(const char *ptr){
   }
   return result;
 }
+
+
+
+
+
 
 
 
