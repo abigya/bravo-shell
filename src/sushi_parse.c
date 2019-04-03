@@ -173,45 +173,64 @@ static void dup_me (int new, int old) {
  *--------------------------------------------------------------------*/
 
 int sushi_spawn(prog_t *exe, int bgmode) {
+    int sushi_spawn(prog_t *exe, int bgmode) {
     int mypipe[2];
-    pid_t child_a, child_b;
+    pid_t child_a, child_b, child_list[cmd_length(exe)];
+    size_t count = 0;
     if(pipe(mypipe)==-1){
        perror("Pipe failed!\n");
        exit(1);
     }
+    printf("\n****Pipe created****\n");
 //stdin is 0
 //stdout is 1
-   child_a= fork();
-   child_b = fork();
+  child_a= fork();
+  child_b= -1;
+  if(child_a != 0){
+    child_b = fork();
+  }
+  prog_t* thisexe = exe;// this is the current exe for any child
+  prog_t* nextexe = exe->prev;// this is the previous exe for any child
    
-   if (child_a==0 && bgmode == 1){//first fork
+   if (child_a == 0 && bgmode == 1){//first fork
+      printf("\n****Child A Created****\n");
       close(mypipe[0]);
       dup_me(mypipe[1],1);
-      start(exe);
-      exe = exe->prev;
+      start(thisexe);
+      thisexe = thisexe->prev;
       perror("execvp failed!\n");
       exit(1);
      
     }
-     if (child_b==0 && bgmode !=1){//child b
-       close(mypipe[1]);
-       dup_me(mypipe[0],0);
-       start(exe);
-       exe = exe->prev;
-      
+     if (child_b == 0 && bgmode != 1){//child b
+      printf("\n****Child B Created****\n");
+      close(mypipe[1]);
+      dup_me(mypipe[0],0);
+      start(nextexe);
+      nextexe = nextexe->prev;
        perror("execvp failed!\n");
        exit(1);
-   }else if (bgmode == 0){
+   }if(child_a != 0){
+      if(bgmode == 0){
       //parent
-       free_memory(exe);
-       close(mypipe[0]);
-       close(mypipe[1]);
-       wait_and_setenv(child_a);
-       wait_and_setenv(child_b);
-  }
+      printf("\nwaiting.....\n");
+      //wait_and_setenv(child_a);
+      wait_and_setenv(child_b);
+      wait_and_setenv(child_a);
+     }
+      free_memory(exe);
+      //close(mypipe[0]);
+      //close(mypipe[1]);
+      printf("Parent returned");
+      return 0;
 
- 
+   }
+
+
+ printf("Child error.\n");
   return 0;
+  
+
   
 }
 
