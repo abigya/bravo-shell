@@ -126,7 +126,7 @@ static size_t cmd_length(prog_t *exe) {
     exe = exe->prev;
     count++;
   }
-  return count;
+  return count+1;
 }
 
 // Wait for the process pid to terminate; once it does, set the
@@ -173,66 +173,54 @@ static void dup_me (int new, int old) {
  *--------------------------------------------------------------------*/
 
 int sushi_spawn(prog_t *exe, int bgmode) {
-    int sushi_spawn(prog_t *exe, int bgmode) {
-    int mypipe[2];
-    pid_t child_a, child_b, child_list[cmd_length(exe)];
-    size_t count = 0;
-    if(pipe(mypipe)==-1){
-       perror("Pipe failed!\n");
-       exit(1);
-    }
-    printf("\n****Pipe created****\n");
-//stdin is 0
-//stdout is 1
-  child_a= fork();
-  child_b= -1;
-  if(child_a != 0){
-    child_b = fork();
-  }
-  prog_t* thisexe = exe;// this is the current exe for any child
-  prog_t* nextexe = exe->prev;// this is the previous exe for any child
-   
-   if (child_a == 0 && bgmode == 1){//first fork
-      printf("\n****Child A Created****\n");
-      close(mypipe[0]);
-      dup_me(mypipe[1],1);
-      start(thisexe);
-      thisexe = thisexe->prev;
-      perror("execvp failed!\n");
-      exit(1);
+   //master process
+   int N = cmd_length(exe);
+   static pid_t children[100];
+   //array of pipes and file descriptors
+   int pipes[N-1][2];
+   for (int i=0;i<(N-1);i++){
+   	pipe(pipes[i]);
+   }
+   for (int j=0;j<N-1;j++){
+        pid_t child = fork();
+        if (child==0){
+           children[j] = getpid();
+           if (j!=0){
+     		dup2(pipes[j-1][1],1);
+        	 start(exe);
+     	   }else if (j!=(N-1)){
+     		dup2(pipes[j][0],0);
+        	start(exe->prev);
+           }
+     	}else{
+    		perror("fork failed!\n");
+                exit(1);
+	}
+                
      
-    }
-     if (child_b == 0 && bgmode != 1){//child b
-      printf("\n****Child B Created****\n");
-      close(mypipe[1]);
-      dup_me(mypipe[0],0);
-      start(nextexe);
-      nextexe = nextexe->prev;
-       perror("execvp failed!\n");
-       exit(1);
-   }if(child_a != 0){
-      if(bgmode == 0){
-      //parent
-      printf("\nwaiting.....\n");
-      //wait_and_setenv(child_a);
-      wait_and_setenv(child_b);
-      wait_and_setenv(child_a);
-     }
-      free_memory(exe);
-      //close(mypipe[0]);
-      //close(mypipe[1]);
-      printf("Parent returned");
-      return 0;
+     //close lose all ends
+     close(pipes[j-1][0]);
+     close(pipes[j][1]);
 
    }
 
-
- printf("Child error.\n");
-  return 0;
+   //master process to close all lose ends
+   for (int k=0; k<(N-1);k++){
+     close(pipes[k][0]);
+     close(pipes[k][1]);
+     wait_and_setenv(children[k]);
+   
+   }
+   //wait for all children to terminate
+   //for (int l=0; l<N; l++){
+   	//wait_and_setenv(children[l]);
+   //}
+   
   
+  return 0;  
 
-  
 }
+
 
 void *super_malloc(size_t size) {
    void* result = malloc(size);
