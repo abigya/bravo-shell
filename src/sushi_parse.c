@@ -173,51 +173,69 @@ static void dup_me (int new, int old) {
  *--------------------------------------------------------------------*/
 
 int sushi_spawn(prog_t *exe, int bgmode) {
-   //master process
+  //master process
    int N = cmd_length(exe);
    static pid_t children[100];
    //array of pipes and file descriptors
    int pipes[N-1][2];
-   for (int i=0;i<(N-1);i++){
-   	pipe(pipes[i]);
+   for (int a =0 ; a<(N-1);a++){
+	pipe(pipes[a]);
    }
-   for (int j=0;j<N-1;j++){
-        pid_t child = fork();
-        if (child==0){
-           children[j] = getpid();
-           if (j!=0){
-     		dup2(pipes[j-1][1],1);
-        	 start(exe);
-     	   }else if (j!=(N-1)){
-     		dup2(pipes[j][0],0);
-        	start(exe->prev);
-           }
-     	}else{
-    		perror("fork failed!\n");
-                exit(1);
+   prog_t *this = exe;
+   for (int i=0; i<N;i++){
+	//pipe(pipes[i]);
+	
+	if ((children[i]==fork())==0){
+		if(i==0){
+			close(pipes[i][0]);
+			dup_me(pipes[i][1],STDOUT_FILENO);
+			close(pipes[i][1]);
+			start(this); //execute the first program
+		}else if(i==(N-1)){
+			close(pipes[i-1][1]);
+			dup_me(pipes[i-1][0],STDIN_FILENO);
+			close(pipes[i-1][0]);
+			//nothing to execute ?
+
+                }else{
+			close(pipes[i-1][1]);
+			dup_me(pipes[i-1][0],0);
+			close(pipes[i-1][0]);
+
+			close(pipes[i][0]);
+			dup_me(pipes[i][1],1);
+			close(pipes[i][1]);
+			start(this); //execute the next program
+			
+                }
+        	
+		
+		
+               
 	}
-                
-     
-     //close lose all ends
-     close(pipes[j-1][0]);
-     close(pipes[j][1]);
+	
+	if((this->prev)!=0){
+		this = this->prev; //iterate to next program
+	}
 
+	
    }
+	//master process
+	for(int k=0;k<N;k++){
+        	wait_and_setenv(children[k]);
+		printf("the %dth child returns\n",k+1);
 
-   //master process to close all lose ends
-   for (int k=0; k<(N-1);k++){
-     close(pipes[k][0]);
-     close(pipes[k][1]);
-     wait_and_setenv(children[k]);
-   
-   }
-   //wait for all children to terminate
-   //for (int l=0; l<N; l++){
-   	//wait_and_setenv(children[l]);
-   //}
-   
-  
+        }
+        
+          for(int j=0;j<(N-1);j++){
+        	close(pipes[j][0]);
+		close(pipes[j][1]);
+
+
+        }
+	
   return 0;  
+   
 
 }
 
