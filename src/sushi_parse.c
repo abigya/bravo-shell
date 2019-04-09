@@ -192,9 +192,10 @@ int sushi_spawn(prog_t *exe, int bgmode) {
 	
   }else{
     while(exe){
-  	child1 = fork();//1st fork
 	int count = 0; 
         int fd[2];
+  	child1 = fork();//1st fork
+	
    	if (child1==0){
 		pipe(fd);
 		child2 = fork();//2nd fork
