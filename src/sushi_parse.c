@@ -173,67 +173,82 @@ static void dup_me (int new, int old) {
  *--------------------------------------------------------------------*/
 
 int sushi_spawn(prog_t *exe, int bgmode) {
-  //master process
-   int N = cmd_length(exe);
-   static pid_t children[100];
-   //array of pipes and file descriptors
-   int pipes[N-1][2];
-   for (int a =0 ; a<(N-1);a++){
-	pipe(pipes[a]);
-   }
-   prog_t *this = exe;
-   for (int i=0; i<N;i++){
-	//pipe(pipes[i]);
+  pid_t child, child1, child2;
+  pid_t children[cmd_length(exe)];
+ 
+  if ((exe->prev)==0){
 	
-	if ((children[i]==fork())==0){
-		if(i==0){
-			close(pipes[i][0]);
-			dup_me(pipes[i][1],STDOUT_FILENO);
-			close(pipes[i][1]);
-			start(this); //execute the first program
-		}else if(i==(N-1)){
-			close(pipes[i-1][1]);
-			dup_me(pipes[i-1][0],STDIN_FILENO);
-			close(pipes[i-1][0]);
-			//nothing to execute ?
+	child = fork();
+	if (child==0){//child process
+		start(exe);
+	}else if(child<0){
+		perror("fork!");
+		exit(1);
 
-                }else{
-			close(pipes[i-1][1]);
-			dup_me(pipes[i-1][0],0);
-			close(pipes[i-1][0]);
-
-			close(pipes[i][0]);
-			dup_me(pipes[i][1],1);
-			close(pipes[i][1]);
-			start(this); //execute the next program
-			
-                }
-        	
-		
-		
-               
+	}else{
+		//parent 
+		wait_and_setenv(child);	
 	}
 	
-	if((this->prev)!=0){
-		this = this->prev; //iterate to next program
+  }else{
+    while(exe){
+  	child1 = fork();//1st fork
+	int count = 0; 
+        int fd[2];
+   	if (child1==0){
+		pipe(fd);
+		child2 = fork();//2nd fork
+		
+			if (child2==0){//grandchild
+				
+				children[count] = getpid();
+                                
+				dup_me(fd[0],0);
+				close(fd[1]);
+				start(exe);
+				perror("execvp!\n");
+				exit(1);
+				count++;
+			}else if(child2<0){
+				perror("fork!\n");
+				exit(1);
+				
+			}else{//return to current child
+				
+				dup_me(fd[1],1);
+				close(fd[0]);
+				start(exe->prev);
+				perror("execvp!\n");
+				exit(1);
+
+			}
+
+	}else if(child1<0){
+
+		perror("fork!\n");
+		exit(1);
+		
 	}
-
-	
-   }
-	//master process
-	for(int k=0;k<N;k++){
-        	wait_and_setenv(children[k]);
-		printf("the %dth child returns\n",k+1);
-
-        }
         
-          for(int j=0;j<(N-1);j++){
-        	close(pipes[j][0]);
-		close(pipes[j][1]);
-
-
-        }
+      if (bgmode==0){
+	   
+	   for (int i=0;i<count;i++){
+	   	if (wait_and_setenv(children[i])==0){
+			fprintf(stdout,"child %d is terminating\n",i+1);
+		}else{
+			fprintf(stdout,"child %d is terminated poorly\n",i+1);	
+		}
+	   }
+      wait_and_setenv(child1);
 	
+     }
+	exe = exe->prev;	
+     }
+  	 
+ 	
+ }
+  
+  
   return 0;  
    
 
