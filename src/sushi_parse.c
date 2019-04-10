@@ -74,7 +74,7 @@ void __not_implemented__() {
 
 // Function skeletons for HW3
 void free_memory(prog_t *exe) {
-    prog_t *temp = exe->prev;
+    prog_t *next = exe->prev;
     int arsize = exe->args.size;
     for (int i=0; i<arsize;i++){
     	if(exe->args.args[i]!=NULL){
@@ -93,9 +93,10 @@ void free_memory(prog_t *exe) {
      } 
     
     free(exe);
-    if(temp!=NULL){
-	free_memory(temp);
+    if(next!=NULL){
+	free_memory(exe->prev);
     }	
+    
   
 }
 
@@ -177,53 +178,75 @@ static void dup_me (int new, int old) {
  *--------------------------------------------------------------------*/
 
 int sushi_spawn(prog_t *exe, int bgmode) {
-  pid_t child0, child1, child2;
-  size_t N = cmd_length(exe);
+  pid_t child, child1, child2; pid_t c;
+  int status = 0;
+ if((exe->prev)==0){
+	c = fork();
+	if(c==0){
+		start(exe);
+		perror("execvpe!\n");
+		exit(1);
+	}else if(c<0){
+		perror("fork!\n");
+		exit(1);
+	}else{
+		wait_and_setenv(c);
+		
+	
+	}
 
-  child1 = -1;
-  child2 = -1;
-  //master process
-   
-   pid_t children[(N-1)*2];
-   //array of pipes and file descriptors
-   int ppipe[2];
-   pipe(ppipe);
-
-   prog_t *first_exe= exe;
-   prog_t *sec_exe= exe->prev;
-   for (size_t i =0; i < N-1;i++){
-	//pipe(pipes[i]);
-  child1 = fork();
-  if(child1 == 0){
-    child2 = fork();
-  }
-  if(child1 == 0){
-    printf("in child 1\n");
-    children[i]= getpid();
-    close(ppipe[0]);
-    dup_me(ppipe[1], 1);
-    start(first_exe); 
-  }else if(child2){
-    printf("in child 2\n");
-    children[i]= getpid();
-    close(ppipe[1]);
-    dup_me(ppipe[0], 0);
-    start(sec_exe); 
-  }else{
-    if(bgmode){
-      wait_and_setenv(child1);
-      wait_and_setenv(child2);
-    }
-    //close(ppipe[1]);
-    //close(ppipe[2]);
-    first_exe = first_exe->prev;
-    sec_exe = sec_exe->prev;
-    printf("in parent...");
-  }
+ }else{ 
+ while(exe){
+	prog_t *temp = exe->prev;	
+	child1= fork();
+	
+	if (child1==0){
+                int fd[2];
+		pipe(fd);
+		child2=fork();
+		if (child2==0){
+			close(fd[1]);
+			dup_me(fd[0],0);
+			start(exe);
+			perror("execvpe!\n");
+			exit(1);
+		}else if(child2<0){
+			perror("fork!\n");
+			exit(1);
+			
+		}else{
+			close(fd[0]);
+			dup_me(fd[1],1);
+			start(exe->prev);
+			perror("execvpe!\n");
+			exit(1);
+		}
+		//close(fd[1]);
+		//close(fd[0]);
+	
+	}else if(child1<0){
+		perror("fork!\n");
+		exit(1);
+	
+        }
+	//master
+		
+		if(bgmode==0){
+			while((child=wait(&status))>0){
+				fprintf(stdout,"child %d has terminated!\n", (int)child);
+		
+			}
+		
+			//free_memory(exe);
+		}
+		
+	 	
+      
+        exe = temp;
+ } 
  
- }
-   return 0;
-
+  }
+  return 0;
 
 }
 
