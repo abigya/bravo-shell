@@ -187,7 +187,7 @@ int sushi_spawn(prog_t *exe, int bgmode) {
 
    prog_t *first_exe= exe;
    prog_t *sec_exe= exe->prev;
-   for (int i =0; i < N;i++){
+   for (int i =0; i < N-1;i++){
 	//pipe(pipes[i]);
   child1 = fork();
   if(child1 == 0){
@@ -198,13 +198,13 @@ int sushi_spawn(prog_t *exe, int bgmode) {
     children[i]= getpid();
     close(ppipe[0]);
     dup_me(ppipe[1], 1);
-    start(first_exe); //execute the first program 
+    start(first_exe); 
   }else if(child2){
     printf("in child 2\n");
     children[i]= getpid();
     close(ppipe[1]);
     dup_me(ppipe[0], 0);
-    start(sec_exe); //execute the first program  
+    start(sec_exe); 
   }else{
     if(bgmode){
       wait_and_setenv(child1);
@@ -216,10 +216,12 @@ int sushi_spawn(prog_t *exe, int bgmode) {
     sec_exe = sec_exe->prev;
     printf("in parent...");
   }
-   
+ 
+ }
+   return 0;
+
 
 }
-
 
 void *super_malloc(size_t size) {
    void* result = malloc(size);

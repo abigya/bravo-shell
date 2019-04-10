@@ -63,8 +63,9 @@ char *sushi_read_line(FILE *in) {
  
 }
 
-int sushi_read_config(char *fname) {
-  FILE *infile;
+int sushi_read_config(char *fname, int ok_if_missing) {
+  if(ok_if_missing!=0){
+   FILE *infile;
    if (NULL == (infile = fopen(fname,"r"))){
         perror(fname);
         exit(0);
@@ -84,4 +85,6 @@ int sushi_read_config(char *fname) {
     }
  
     return 0; 
+ }
+	exit(1);
 }

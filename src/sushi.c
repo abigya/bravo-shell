@@ -16,19 +16,27 @@ static void prevent_interruption() {
 }
 
 int main(int argc, char *argv[]) {
+    setenv(argv[0],"$SHELL",1);
     char *directory;
     char *fname = "/sushi.conf";
     directory = super_malloc(strlen(getenv("HOME"))+ strlen(fname)+1);
     strcat(strcpy(directory,getenv("HOME")),fname);
     int p;
     char *input;
-    int x = sushi_read_config(directory);
+    int x = sushi_read_config(directory,1);
+    
     
     prevent_interruption();
     
   if (x==0){
-    while(sushi_exit==0){
-     fprintf(stdout,"%s",SUSHI_DEFAULT_PROMPT);
+     while(sushi_exit==0){
+     char* prompt_var = getenv("$PS1"); 
+	if(prompt_var==NULL){
+		fprintf(stdout,"%s",SUSHI_DEFAULT_PROMPT);
+     
+	}else{
+		fprintf(stdout,"%s",prompt_var);	
+	}
      input = sushi_read_line(stdin);
      if (input!=NULL){
       	p = sushi_parse_command(input);
