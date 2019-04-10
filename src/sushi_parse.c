@@ -173,84 +173,49 @@ static void dup_me (int new, int old) {
  *--------------------------------------------------------------------*/
 
 int sushi_spawn(prog_t *exe, int bgmode) {
-  pid_t child, child1, child2;
-  pid_t children[cmd_length(exe)];
- 
-  if ((exe->prev)==0){
-	
-	child = fork();
-	if (child==0){//child process
-		start(exe);
-	}else if(child<0){
-		perror("fork!");
-		exit(1);
+  pid_t child0, child1, child2;
+  const int N = cmd_length(exe);
 
-	}else{
-		//parent 
-		wait_and_setenv(child);	
-	}
-	
+  child1 = -1;
+  child2 = -1;
+  //master process
+   
+   pid_t children[(N-1)*2];
+   //array of pipes and file descriptors
+   int ppipe[2];
+   pipe(ppipe);
+
+   prog_t *first_exe= exe;
+   prog_t *sec_exe= exe->prev;
+   for (int i =0; i < N;i++){
+	//pipe(pipes[i]);
+  child1 = fork();
+  if(child1 == 0){
+    child2 = fork();
+  }
+  if(child1 == 0){
+    printf("in child 1\n");
+    children[i]= getpid();
+    close(ppipe[0]);
+    dup_me(ppipe[1], 1);
+    start(first_exe); //execute the first program 
+  }else if(child2){
+    printf("in child 2\n");
+    children[i]= getpid();
+    close(ppipe[1]);
+    dup_me(ppipe[0], 0);
+    start(sec_exe); //execute the first program  
   }else{
-    while(exe){
-	int count = 0; 
-        int fd[2];
-  	child1 = fork();//1st fork
-	
-   	if (child1==0){
-		pipe(fd);
-		child2 = fork();//2nd fork
-		
-			if (child2==0){//grandchild
-				
-				children[count] = getpid();
-                                
-				dup_me(fd[0],0);
-				close(fd[1]);
-				start(exe);
-				perror("execvp!\n");
-				exit(1);
-				count++;
-			}else if(child2<0){
-				perror("fork!\n");
-				exit(1);
-				
-			}else{//return to current child
-				
-				dup_me(fd[1],1);
-				close(fd[0]);
-				start(exe->prev);
-				perror("execvp!\n");
-				exit(1);
-
-			}
-
-	}else if(child1<0){
-
-		perror("fork!\n");
-		exit(1);
-		
-	}
-        
-      if (bgmode==0){
-	   
-	   for (int i=0;i<count;i++){
-	   	if (wait_and_setenv(children[i])==0){
-			fprintf(stdout,"child %d is terminating\n",i+1);
-		}else{
-			fprintf(stdout,"child %d is terminated poorly\n",i+1);	
-		}
-	   }
+    if(bgmode){
       wait_and_setenv(child1);
-	
-     }
-	exe = exe->prev;	
-     }
-  	 
- 	
- }
-  
-  
-  return 0;  
+      wait_and_setenv(child2);
+    }
+    //close(ppipe[1]);
+    //close(ppipe[2]);
+    first_exe = first_exe->prev;
+    sec_exe = sec_exe->prev;
+    printf("in parent...");
+  }
    
 
 }
