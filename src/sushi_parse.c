@@ -74,6 +74,7 @@ void __not_implemented__() {
 
 // Function skeletons for HW3
 void free_memory(prog_t *exe) {
+    prog_t *temp = exe->prev;
     int arsize = exe->args.size;
     for (int i=0; i<arsize;i++){
     	if(exe->args.args[i]!=NULL){
@@ -92,6 +93,9 @@ void free_memory(prog_t *exe) {
      } 
     
     free(exe);
+    if(temp!=NULL){
+	free_memory(temp);
+    }	
   
 }
 
@@ -174,7 +178,7 @@ static void dup_me (int new, int old) {
 
 int sushi_spawn(prog_t *exe, int bgmode) {
   pid_t child0, child1, child2;
-  const int N = cmd_length(exe);
+  size_t N = cmd_length(exe);
 
   child1 = -1;
   child2 = -1;
@@ -187,7 +191,7 @@ int sushi_spawn(prog_t *exe, int bgmode) {
 
    prog_t *first_exe= exe;
    prog_t *sec_exe= exe->prev;
-   for (int i =0; i < N-1;i++){
+   for (size_t i =0; i < N-1;i++){
 	//pipe(pipes[i]);
   child1 = fork();
   if(child1 == 0){
