@@ -94,7 +94,7 @@ void free_memory(prog_t *exe) {
     
     free(exe);
     if(next!=NULL){
-	free_memory(exe->prev);
+	free_memory(next);
     }	
     
   
@@ -221,8 +221,7 @@ int sushi_spawn(prog_t *exe, int bgmode) {
 			perror("execvpe!\n");
 			exit(1);
 		}
-		//close(fd[1]);
-		//close(fd[0]);
+		
 	
 	}else if(child1<0){
 		perror("fork!\n");
@@ -237,7 +236,7 @@ int sushi_spawn(prog_t *exe, int bgmode) {
 		
 			}
 		
-			//free_memory(exe);
+			
 		}
 		
 	 	
