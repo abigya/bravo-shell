@@ -184,12 +184,13 @@ int sushi_spawn(prog_t *exe, int bgmode) {
 	c = fork();
 	if(c==0){
 		start(exe);
-		perror("execvpe!\n");
+		perror("execvpe!\n"); // DZ: Don't add \n
 		exit(1);
 	}else if(c<0){
-		perror("fork!\n");
+		perror("fork!\n"); // DZ: Don't add \n
 		exit(1);
 	}else{
+	  // DZ: Must depend on bgmode
 		wait_and_setenv(c);
 		
 	
@@ -199,7 +200,8 @@ int sushi_spawn(prog_t *exe, int bgmode) {
  while(exe){
 	prog_t *temp = exe->prev;	
 	child1= fork();
-	
+
+	// The pipes are not arranged correctlt, the output is wrong.
 	if (child1==0){
                 int fd[2];
 		pipe(fd);

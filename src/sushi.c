@@ -16,6 +16,8 @@ static void prevent_interruption() {
 }
 
 int main(int argc, char *argv[]) {
+  // DZ: The name of the variable is SHELL
+  // DZ: The order of parameters is wrong
     setenv(argv[0],"$SHELL",1);
     char *directory;
     char *fname = "/sushi.conf";
@@ -30,6 +32,7 @@ int main(int argc, char *argv[]) {
     
   if (x==0){
      while(sushi_exit==0){
+       // DZ: The name of the variable is PS1
      char* prompt_var = getenv("$PS1"); 
 	if(prompt_var==NULL){
 		fprintf(stdout,"%s",SUSHI_DEFAULT_PROMPT);

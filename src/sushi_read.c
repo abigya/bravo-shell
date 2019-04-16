@@ -64,7 +64,7 @@ char *sushi_read_line(FILE *in) {
 }
 
 int sushi_read_config(char *fname, int ok_if_missing) {
-  if(ok_if_missing!=0){
+  if(ok_if_missing!=0){ // DZ: This condition is wrong
    FILE *infile;
    if (NULL == (infile = fopen(fname,"r"))){
         perror(fname);
