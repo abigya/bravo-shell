@@ -64,7 +64,10 @@ char *sushi_read_line(FILE *in) {
 }
 
 int sushi_read_config(char *fname, int ok_if_missing) {
-  if(ok_if_missing!=0){
+  if(ok_if_missing==0){
+	perror("There seems to be a problem!\n");
+	exit(1);
+  }else{
    FILE *infile;
    if (NULL == (infile = fopen(fname,"r"))){
         perror(fname);
@@ -83,8 +86,8 @@ int sushi_read_config(char *fname, int ok_if_missing) {
      }
      	
     }
+  }
+	
+ return 0;
  
-    return 0; 
- }
-	exit(1);
 }

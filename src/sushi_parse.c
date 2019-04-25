@@ -74,6 +74,7 @@ void __not_implemented__() {
 
 // Function skeletons for HW3
 void free_memory(prog_t *exe) {
+  while(exe->prev){
     prog_t *next = exe->prev;
     int arsize = exe->args.size;
     for (int i=0; i<arsize;i++){
@@ -91,13 +92,10 @@ void free_memory(prog_t *exe) {
       if (exe->redirection.out2!=NULL){
           free(exe->redirection.out2);
      } 
-    
     free(exe);
-    if(next!=NULL){
-	free_memory(next);
-    }	
+    exe = next;	
     
-  
+  }
 }
 
 // Skeleton
@@ -131,7 +129,7 @@ static size_t cmd_length(prog_t *exe) {
     exe = exe->prev;
     count++;
   }
-  return count+1;
+  return count;
 }
 
 // Wait for the process pid to terminate; once it does, set the
@@ -176,7 +174,7 @@ static void dup_me (int new, int old) {
 /*
  * You can use this function instead of yours if you want.
  */
-int sushi_spawn_dz(prog_t *exe, int bgmode) {
+int sushi_spawn(prog_t *exe, int bgmode) {
   int pipe_length = 0, max_pipe = cmd_length(exe);
   pid_t pid[max_pipe];
 
@@ -225,77 +223,7 @@ int sushi_spawn_dz(prog_t *exe, int bgmode) {
  * End of "convenience" functions
  *--------------------------------------------------------------------*/
 
-int sushi_spawn(prog_t *exe, int bgmode) {
-  pid_t child, child1, child2; pid_t c;
-  int status = 0;
- if((exe->prev)==0){
-	c = fork();
-	if(c==0){
-		start(exe);
-		perror("execvpe!\n");
-		exit(1);
-	}else if(c<0){
-		perror("fork!\n");
-		exit(1);
-	}else{
-		wait_and_setenv(c);
-		
-	
-	}
 
- }else{ 
- while(exe){
-	prog_t *temp = exe->prev;	
-	child1= fork();
-	
-	if (child1==0){
-                int fd[2];
-		pipe(fd);
-		child2=fork();
-		if (child2==0){
-			close(fd[1]);
-			dup_me(fd[0],0);
-			start(exe);
-			perror("execvpe!\n");
-			exit(1);
-		}else if(child2<0){
-			perror("fork!\n");
-			exit(1);
-			
-		}else{
-			close(fd[0]);
-			dup_me(fd[1],1);
-			start(exe->prev);
-			perror("execvpe!\n");
-			exit(1);
-		}
-		
-	
-	}else if(child1<0){
-		perror("fork!\n");
-		exit(1);
-	
-        }
-	//master
-		
-		if(bgmode==0){
-			while((child=wait(&status))>0){
-				fprintf(stdout,"child %d has terminated!\n", (int)child);
-		
-			}
-		
-			
-		}
-		
-	 	
-      
-        exe = temp;
- } 
- 
-  }
-  return 0;
-
-}
 
 void *super_malloc(size_t size) {
    void* result = malloc(size);
@@ -313,7 +241,7 @@ void *super_realloc(void *ptr, size_t size) {
   return result;
 }
 
-// DZ: You changed the prototype!
+
 char *super_strdup(const char *ptr){
   void* result = strdup(ptr);
   if(NULL == result){
