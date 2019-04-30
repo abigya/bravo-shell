@@ -192,12 +192,39 @@ int sushi_spawn(prog_t *exe, int bgmode) {
       perror(prog->args.args[0]);
       return 1;
     case 0: // Child
-      dup_me(pipefd[0], STDIN_FILENO);
-      dup_me(old_stdout, STDOUT_FILENO);
-      if(pipefd[1] != STDOUT_FILENO)
-	close(pipefd[1]);
-      start(prog);
-      exit(1);
+	if (prog->redirection.in!=NULL){//read
+		char *token = strtok(prog->args.args[0],"<");
+		char *file;
+		strcpy(file, strtok(NULL, "<"));
+	 	int infile = open(file,O_RDONLY,0777);
+		dup_me(infile,STDIN_FILENO);
+		close(infile);
+	}else if(prog->redirection.out1!=NULL){//write
+		char *token = strtok(prog->args.args[cmd_length(prog)-1],">");
+		char *file;
+		strcpy(file, strtok(NULL, ">"));
+		int outfile = open(file,O_WRONLY| O_CREAT | O_TRUNC,0777);
+		dup_me(outfile,STDOUT_FILENO);
+                close(outfile);
+	}else if(prog->redirection.out2!=NULL){//append
+		char *token = strtok(prog->args.args[cmd_length(prog)-1],">>");
+		char *file;
+		strcpy(file, strtok(NULL, ">>"));
+		int outfile = open(file,O_WRONLY| O_CREAT | O_APPEND,0777);
+		dup_me(outfile,STDOUT_FILENO);
+		close(outfile);
+		
+	}
+      	dup_me(pipefd[0], STDIN_FILENO);
+      	dup_me(old_stdout, STDOUT_FILENO);
+      
+      	if(pipefd[1] != STDOUT_FILENO)
+		close(pipefd[1]);
+	
+      	start(prog);
+      	exit(1);
+      	
+      
     default: // Parent
       if(pipefd[0] != STDIN_FILENO) close(pipefd[0]);
       if(old_stdout != STDOUT_FILENO) close(old_stdout);
@@ -218,6 +245,7 @@ int sushi_spawn(prog_t *exe, int bgmode) {
   
   return status;
 }
+
 
 /*--------------------------------------------------------------------
  * End of "convenience" functions
