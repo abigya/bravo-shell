@@ -193,24 +193,17 @@ int sushi_spawn(prog_t *exe, int bgmode) {
       return 1;
     case 0: // Child
 	if (prog->redirection.in!=NULL){//read
-		char *token = strtok(prog->args.args[0],"<");
-		char *file;
-		strcpy(file, strtok(NULL, "<"));
-	 	int infile = open(file,O_RDONLY,0777);
+	 	int infile = open(prog->redirection.in,O_RDONLY,0777);
 		dup_me(infile,STDIN_FILENO);
 		close(infile);
-	}else if(prog->redirection.out1!=NULL){//write
-		char *token = strtok(prog->args.args[cmd_length(prog)-1],">");
-		char *file;
-		strcpy(file, strtok(NULL, ">"));
-		int outfile = open(file,O_WRONLY| O_CREAT | O_TRUNC,0777);
+	}
+	if(prog->redirection.out1!=NULL){//write
+		int outfile = open(prog->redirection.out1,O_WRONLY| O_CREAT | O_TRUNC,0777);
 		dup_me(outfile,STDOUT_FILENO);
                 close(outfile);
-	}else if(prog->redirection.out2!=NULL){//append
-		char *token = strtok(prog->args.args[cmd_length(prog)-1],">>");
-		char *file;
-		strcpy(file, strtok(NULL, ">>"));
-		int outfile = open(file,O_WRONLY| O_CREAT | O_APPEND,0777);
+        }
+	if(prog->redirection.out2!=NULL){//append
+		int outfile = open(prog->redirection.out2,O_WRONLY| O_CREAT | O_APPEND,0777);
 		dup_me(outfile,STDOUT_FILENO);
 		close(outfile);
 		
