@@ -5,6 +5,8 @@
 #include "sushi.h"
 #include "sushi_yyparser.tab.h"
 #include <stdlib.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 // https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
 char *sushi_unquote(char *s) {
