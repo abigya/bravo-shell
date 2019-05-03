@@ -181,7 +181,7 @@ int sushi_spawn(prog_t *exe, int bgmode) {
   pid_t pid[max_pipe];
 
   int old_stdout = STDOUT_FILENO;
-  
+ 
   for(prog_t *prog = exe; prog; prog = prog->prev) {
     int pipefd[2] = {STDIN_FILENO, old_stdout};
     if (prog->prev && -1 == pipe(pipefd)) {
@@ -196,18 +196,19 @@ int sushi_spawn(prog_t *exe, int bgmode) {
     case 0: // Child
 	if (prog->redirection.in!=NULL){//read
 	 	int infile = open(prog->redirection.in,O_RDONLY,0777);
-		dup_me(infile,STDIN_FILENO);
+		dup_me(infile,0);
 		close(infile);
 	}
 	if(prog->redirection.out1!=NULL){//write
 		int outfile = open(prog->redirection.out1,O_WRONLY| O_CREAT | O_TRUNC,0777);
-		dup_me(outfile,STDOUT_FILENO);
+		dup_me(outfile,1);
                 close(outfile);
         }
 	if(prog->redirection.out2!=NULL){//append
 		int outfile = open(prog->redirection.out2,O_WRONLY| O_CREAT | O_APPEND,0777);
-		dup_me(outfile,STDOUT_FILENO);
+		dup_me(outfile,1);
 		close(outfile);
+		
 		
 	}
       	dup_me(pipefd[0], STDIN_FILENO);
