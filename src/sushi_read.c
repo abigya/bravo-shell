@@ -64,6 +64,8 @@ char *sushi_read_line(FILE *in) {
 }
 
 int sushi_read_config(char *fname, int ok_if_missing) {
+  // DZ: The function should exit only if the file is missing and it is
+  // not OK to be missing
   if(ok_if_missing==0){
 	perror("There seems to be a problem!\n");
 	exit(1);
@@ -71,6 +73,7 @@ int sushi_read_config(char *fname, int ok_if_missing) {
    FILE *infile;
    if (NULL == (infile = fopen(fname,"r"))){
         perror(fname);
+	return 0;
         exit(0);
     }
    

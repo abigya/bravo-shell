@@ -279,10 +279,12 @@ char *super_strdup(const char *ptr){
  * New skeleton functions
  */
 void sushi_display_wd() {
+  // DZ: Why 260?
   char* buffer = super_malloc(sizeof(char) * 260);
   if(getcwd(buffer, 260) == NULL){
     perror("path error");
   }else{
+    // DZ: "%s\n"
     printf("%s", buffer);
   }
   free(buffer);
@@ -290,6 +292,7 @@ void sushi_display_wd() {
 
 void sushi_change_wd(char *new_wd) {
   if(chdir(new_wd) == -1){
+    // DZ: Must be perror(new_wd)
     perror("directory");
   }
   free(new_wd);
